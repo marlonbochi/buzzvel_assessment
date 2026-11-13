@@ -107,3 +107,15 @@ describe("Chip, AvatarStack and icons", () => {
     }
   });
 });
+
+test("text variant drops box padding so it aligns with surrounding text", () => {
+  for (const size of ["sm", "md", "lg"] as const) {
+    expect(buttonClasses({ variant: "text", size })).not.toMatch(/\bp[xy]-/);
+  }
+});
+
+test("sm size does not carry md padding (no conflicting utilities)", () => {
+  const classes = buttonClasses({ size: "sm" }).split(" ");
+  expect(classes).toContain("px-5");
+  expect(classes).not.toContain("px-7");
+});

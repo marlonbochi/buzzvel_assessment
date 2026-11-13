@@ -15,10 +15,13 @@ export function Header() {
       id="top"
       className="sticky top-0 z-40 border-b border-line-1 bg-background-light-yellow"
     >
-      <Container className="flex h-[68px] items-center justify-between lg:h-[69px]">
+      <Container className="relative flex h-[68px] items-center justify-between lg:h-[69px]">
         <Logo />
 
-        <nav aria-label="Primary" className="hidden lg:block">
+        <nav
+          aria-label="Primary"
+          className="absolute top-1/2 left-1/2 hidden -translate-x-1/2 -translate-y-1/2 lg:block"
+        >
           <ul className="flex items-center gap-8">
             {primaryNav.map((link) => (
               <li key={link.label}>
@@ -36,7 +39,7 @@ export function Header() {
           </a>
           <a
             href={headerActions.cta.href}
-            className={buttonClasses({ variant: "primary", className: "px-5 py-2.5" })}
+            className={buttonClasses({ variant: "primary", size: "sm" })}
           >
             {headerActions.cta.label}
           </a>
