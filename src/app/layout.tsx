@@ -31,7 +31,15 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${jakarta.variable} ${inter.variable}`}>
-      <body>{children}</body>
+      <body>
+        <a
+          href="#main"
+          className="sr-only z-50 rounded-lg bg-primary-blue px-4 py-3 text-sm font-bold text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-blue"
+        >
+          Skip to content
+        </a>
+        {children}
+      </body>
     </html>
   );
 }

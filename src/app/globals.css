@@ -141,6 +141,11 @@
     -webkit-text-size-adjust: 100%;
   }
 
+  /* Anchored sections land below the sticky header (68–69px) with breathing room. */
+  [id] {
+    scroll-margin-top: 88px;
+  }
+
   body {
     background-color: var(--color-background-white);
     color: var(--color-text-primary);
