@@ -102,7 +102,19 @@ Colors, defined in Tailwind's `@theme`:
 
 Shadow `Shadow/Dark/M`: `0 0 4px #00000012, 0 4px 6px -1px #0000001A` (floating badges, form card).
 
-**Contrast check required:** `text-tertiary` `#6d7384` on `#f9f8f3`, and `text-white-tertiary` `#9e9faa` on `#171b2c`, must be verified against WCAG AA (4.5:1 for body text). If either fails, darken or lighten it minimally and note the deviation in the README. Accessibility wins over pixel fidelity here.
+**Contrast (pre-computed, WCAG AA needs 4.5:1 for normal text):**
+
+| Pair | Ratio | Result |
+|---|---|---|
+| `text-secondary` on `background-light-yellow` | ≈ 5.3 | pass |
+| `text-tertiary` on white | ≈ 4.7 | pass |
+| `text-tertiary` on `background-light-yellow` | **≈ 4.47** | **fails marginally** |
+| white on `primary-blue` | ≈ 5.5 | pass |
+| `text-white-tertiary` on `background-darkblue` | ≈ 6.5 | pass |
+
+`text-tertiary` on light yellow is used for the "STEP 0X" labels. Where it sits on light yellow, use a minimally darkened value (for example `#646a7a`, or reuse `text-secondary`), and note the deviation in the README. Accessibility wins over pixel fidelity. Re-verify any other pair the axe scan flags.
+
+**Error color (not in Figma, our call):** add an `error` token in the red range that passes 4.5:1 on both white and light yellow (for example `#c4321f`).
 
 ### 6.2 Typography (from Figma text styles)
 
@@ -360,7 +372,7 @@ A single multi-stage `Dockerfile` (Node 22 Alpine, pnpm via Corepack) and a `com
 
 - **`dev` service (`target: dev`):** runs `next dev` with hot reload. The source is bind-mounted; `node_modules` and `.next` are anonymous volumes so host and container dependencies do not clash. `WATCHPACK_POLLING=true` and `CHOKIDAR_USEPOLLING=true` keep file watching reliable on macOS bind mounts. Port 3000.
 - **`prod` service (`target: runner`):** builds with `output: "standalone"`. The runtime image contains only the standalone server, `.next/static` and `public`. It runs as a non-root user with `NODE_ENV=production` and `NEXT_TELEMETRY_DISABLED=1`, and has a healthcheck. Port 3000 internally, mapped to host 8080 so it can run alongside dev.
-- **Test tooling** (Playwright and Lighthouse CI need a browser) runs in containers too, using Compose profiles (for example `docker compose --profile test run e2e`, `… run lighthouse`), pointed at the `prod` service. The exact images and service names are the builder's call; the official Playwright image is the expected base for e2e.
+- **Test tooling** (Playwright and Lighthouse CI need a browser) runs in containers too, using Compose profiles (for example `docker compose --profile test run e2e`, `… run lighthouse`), pointed at the `prod` service. The exact images and service names are the builder's call; the official Playwright image is the expected base for e2e. **The Lighthouse container must reach the app as `http://localhost:…`** (for example `network_mode: "service:prod"`), not `http://prod:3000`. A non-localhost HTTP origin is not a secure context, which would fail Best Practices audits and skew the score.
 - `.dockerignore` excludes `node_modules`, `.next`, `design/`, `.git`, test reports.
 - **`storybook` service** (profile `dev` or its own profile): runs Storybook dev on port 6006 with the same bind-mount and polling setup as `dev`.
 - `package.json` scripts mirror these for running without Docker: `dev`, `build`, `start`, `test`, `test:e2e`, `lint`, `typecheck`, `lhci`, `storybook`, `build-storybook`.
@@ -388,3 +400,5 @@ A single multi-stage `Dockerfile` (Node 22 Alpine, pnpm via Corepack) and a `com
 - Whether to add a subtle reveal-on-scroll animation, as long as reduced motion is respected and Lighthouse stays ≥ 95.
 - Exact test container images and Compose service names.
 - Alt-text wording for each image.
+
+**Deferred to delivery time (the candidate decides):** whether to publish an optional live preview (for example on Vercel). The brief lists a live preview and a Lighthouse screenshot as optional. The Lighthouse screenshot is in scope regardless.
