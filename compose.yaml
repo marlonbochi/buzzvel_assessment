@@ -16,6 +16,21 @@ services:
       - /app/node_modules
       - /app/.next
 
+  # Storybook component catalogue: http://localhost:6006
+  storybook:
+    build:
+      context: .
+      target: dev
+    command: ["pnpm", "storybook", "--host", "0.0.0.0", "--ci", "--no-open"]
+    ports:
+      - "${STORYBOOK_PORT:-6006}:6006"
+    environment:
+      WATCHPACK_POLLING: "true"
+      CHOKIDAR_USEPOLLING: "true"
+    volumes:
+      - .:/app
+      - /app/node_modules
+
   # Optimized production build (standalone, non-root): http://localhost:8080
   prod:
     build:
