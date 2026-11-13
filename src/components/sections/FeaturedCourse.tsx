@@ -11,7 +11,7 @@ export function FeaturedCourse() {
     <section aria-labelledby="featured-title" className="bg-primary-blue py-16 lg:py-[100px]">
       <Container className="flex flex-col gap-12 lg:flex-row lg:items-center lg:gap-15">
         <div className="relative lg:min-w-0 lg:flex-1">
-          <div className="relative aspect-[362/280] overflow-hidden rounded-2xl bg-primary-blue-light lg:aspect-auto lg:h-[408px]">
+          <div className="relative aspect-[362/280] overflow-hidden rounded-2xl bg-primary-blue-light md:aspect-[16/10] lg:aspect-auto lg:h-[408px]">
             <Image
               src={featuredCourse.image.src}
               alt={featuredCourse.image.alt}

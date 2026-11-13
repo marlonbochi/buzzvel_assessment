@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { inter, jakarta } from "@/lib/fonts";
+import { siteUrl } from "@/lib/site";
 import "./globals.css";
 
-const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
 const title = "Luma — Build skills that actually move you forward";
 const description =
   "Practical courses taught by people who do the work every day. Learn design, technology, business and more — one focused lesson at a time.";
