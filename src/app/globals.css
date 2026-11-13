@@ -1,0 +1,172 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens from the Figma file (Buzzvel FE - Test 2026).
+ * Names follow the Figma variables, with the "backgrounnd" typo corrected.
+ */
+@theme {
+  --color-primary-blue: #3157f6;
+  --color-primary-blue-light: #e2e8ff;
+  --color-primary-orange: #ff704d;
+  --color-background-orange: #ffcb9f;
+  --color-secondary-yellow: #ffee7e;
+  --color-background-yellow: #fff1c2;
+  --color-background-light-yellow: #f9f8f3;
+  --color-background-white: #ffffff;
+  --color-background-darkblue: #171b2c;
+  --color-text-primary: #171b2c;
+  --color-text-secondary: #656770;
+  --color-text-tertiary: #6d7384;
+  /* Not in Figma: text-tertiary fails AA (4.47:1) on light yellow; this passes. */
+  --color-text-tertiary-strong: #646a7a;
+  --color-text-white-primary: #ffffff;
+  --color-text-white-secondary: #e7e7ec;
+  --color-text-white-tertiary: #9e9faa;
+  --color-line-1: #dbdfeb;
+  /* Not in Figma: form error color, AA on white and light yellow. */
+  --color-error: #c4321f;
+
+  --shadow-card: 0 0 4px 0 #00000012, 0 4px 6px -1px #0000001a;
+}
+
+/* next/font exposes --font-next-* on <html>; inline them so utilities resolve at use site. */
+@theme inline {
+  --font-jakarta: var(--font-next-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-inter: var(--font-next-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-next-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Type scale: mobile value by default, desktop value from the lg breakpoint (Figma text styles). */
+@utility text-h1 {
+  font-family: --theme(--font-jakarta);
+  font-weight: 800;
+  font-size: 2.5rem;
+  line-height: 2.75rem;
+  letter-spacing: -1px;
+  @media (width >= 64rem) {
+    font-size: 4rem;
+    line-height: 4.375rem;
+    letter-spacing: -1.6px;
+  }
+}
+
+@utility text-h2 {
+  font-family: --theme(--font-jakarta);
+  font-weight: 800;
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+  letter-spacing: -0.9px;
+  @media (width >= 64rem) {
+    font-size: 3.5rem;
+    line-height: 4rem;
+    letter-spacing: -1.4px;
+  }
+}
+
+@utility text-h3 {
+  font-family: --theme(--font-jakarta);
+  font-weight: 800;
+  font-size: 2rem;
+  line-height: 2.25rem;
+  letter-spacing: -0.8px;
+  @media (width >= 64rem) {
+    font-size: 3rem;
+    line-height: 3.5rem;
+    letter-spacing: -1.2px;
+  }
+}
+
+@utility text-h5 {
+  font-family: --theme(--font-jakarta);
+  font-weight: 700;
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  @media (width >= 64rem) {
+    line-height: 2rem;
+  }
+}
+
+@utility text-quote {
+  font-family: --theme(--font-jakarta);
+  font-weight: 600;
+  font-size: 1.25rem;
+  line-height: 2rem;
+  @media (width >= 64rem) {
+    font-size: 1.875rem;
+    line-height: 2.75rem;
+    letter-spacing: -0.75px;
+  }
+}
+
+@utility text-subtitle-1 {
+  font-family: --theme(--font-inter);
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.625rem;
+  @media (width >= 64rem) {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+}
+
+@utility text-subtitle-2 {
+  font-family: --theme(--font-inter);
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+  @media (width >= 64rem) {
+    font-size: 1rem;
+    line-height: 1.75rem;
+  }
+}
+
+@utility text-body-1 {
+  font-family: --theme(--font-inter);
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+}
+
+@utility text-overline {
+  font-family: --theme(--font-inter);
+  font-weight: 600;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  letter-spacing: 1.44px;
+  text-transform: uppercase;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-background-white);
+    color: var(--color-text-primary);
+    font-family: --theme(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
