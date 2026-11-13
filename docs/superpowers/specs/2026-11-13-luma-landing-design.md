@@ -335,13 +335,61 @@ Implementation follows test-driven development for behavior: tests are written f
    - `ContactForm`: shows errors, focuses the first invalid field, shows the pending and success states.
    - `MobileNav`: toggles `aria-expanded`, closes on Esc and returns focus, closes on link click.
    - Key presentational components: render props correctly.
-2. **End-to-end (Playwright, against the production build), three viewport projects (375×812, 768×1024, 1280×800):**
-   - All sections render, in order.
-   - No horizontal overflow (`scrollWidth <= clientWidth`).
-   - Mobile menu is keyboard-operable.
-   - Anchor links reach their sections.
-   - Form error and success flows work.
-   - An `@axe-core/playwright` scan reports **zero serious or critical violations**.
+2. **End-to-end (Playwright, against the production build).** It runs on three viewport projects: `mobile` (375×812, touch enabled, `hasTouch` + `isMobile`), `tablet` (768×1024) and `desktop` (1280×800). Chromium is required. WebKit on the mobile project is recommended if it stays stable in the container (builder's call).
+
+   Specs are split by concern under `tests/e2e/`, and use role- and label-based locators (`getByRole`, `getByLabel`), never CSS classes. Every click assertion checks the **resulting state**, not just that the click happened.
+
+   **2a. Page structure and layout** (`layout.spec.ts`)
+   - All ten sections render in design order, each reachable by its heading.
+   - No horizontal overflow at any project (`scrollWidth <= clientWidth`), also checked at 320 px and 1440 px.
+   - Exactly one `h1`; page `<title>` and meta description match the metadata.
+   - Breakpoint behavior: desktop nav visible and hamburger hidden at `desktop`, and the reverse at `mobile` and `tablet`.
+
+   **2b. Navigation clicks** (`navigation.spec.ts`)
+   - Every in-page anchor from §7.11, clicked in the header, the hero, the featured course, the people section and the footer. After each click:
+     - the URL hash updates
+     - the target section's heading is in the viewport, and not hidden under the header if the header is sticky
+   - The "luma." logo returns to the top of the page.
+   - Placeholder `#` links do not navigate away or throw console errors.
+   - The `mailto:contact@luma.com` link has the correct `href`. Its target is asserted, it is not followed.
+
+   **2c. Mobile menu** (`mobile-menu.spec.ts`, mobile and tablet projects)
+   - **Tap the hamburger:** the panel opens, `aria-expanded="true"`, all four nav links plus "Log in" and "Start learning" are visible, and the body scroll is locked.
+   - **Tap the toggle again:** the panel closes.
+   - **Tap a nav link:** the menu closes and the page scrolls to the section.
+   - **Press Esc:** the menu closes and focus returns to the toggle.
+   - **Keyboard only:** Tab reaches the toggle, Enter/Space opens it, Tab cycles inside the open menu (focus trap) and never reaches content behind it.
+   - **Resize to desktop while open:** the menu closes and the desktop nav shows.
+
+   **2d. Contact form** (`contact-form.spec.ts`)
+   - **Empty submit:** click "Send message". All three fields show their error messages, `aria-invalid="true"` is set, and focus lands on "Full name".
+   - **Invalid email:** only the email field shows an error. Fixing it clears the error live.
+   - **Too-short question:** an error appears with the minimum-length message.
+   - **Happy path:** fill valid values and click submit. The button shows "Sending…" and is disabled; then the success message appears in the live region and the fields reset.
+   - **Keyboard submit:** pressing Enter in an input submits the form.
+   - **Progressive enhancement:** with JavaScript disabled (`javaScriptEnabled: false` context), a valid submission still reaches the Server Action and renders the success state, and an invalid one renders server-side errors.
+
+   **2e. Hover and focus states** (`interactions.spec.ts`, desktop project)
+   - Hovering a category card changes its border and arrow (computed-style assertion).
+   - Clicking anywhere on a category card follows its "Explore" link (stretched link). Each card has a single tab stop.
+   - The keyboard focus ring is visible on every interactive element type (button, link, input, toggle): `:focus-visible` outline is not `none`.
+   - "Skip to content" is the first Tab stop, and activating it moves focus to `<main>`.
+
+   **2f. Reduced motion** (`reduced-motion.spec.ts`)
+   - With `reducedMotion: 'reduce'`, anchor clicks jump without smooth scrolling and the menu opens without transition (computed `transition-duration` is `0s` or the scroll position is reached immediately).
+
+   **2g. Accessibility scan** (`a11y.spec.ts`)
+   - `@axe-core/playwright` on the full page at each project reports **zero serious or critical violations**.
+   - It runs again with the mobile menu open and with the form in its error state, since those states are not in the initial DOM.
+
+   **2h. Health checks** (applied to every spec through a shared fixture)
+   - No console errors or uncaught page errors during any test.
+   - No failed network requests (4xx/5xx), for example a missing image.
+
+   **Running:**
+   - `pnpm test:e2e` builds and starts the production server via Playwright's `webServer`.
+   - In Docker, `docker compose --profile test run e2e` runs against the `prod` service.
+   - On failure, keep traces, screenshots and the HTML report as artifacts (git-ignored).
 3. **Lighthouse CI (`@lhci/cli`) against the production Docker container:**
    - Mobile and desktop presets.
    - Assertions: every category ≥ 0.95.
