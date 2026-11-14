@@ -1,4 +1,4 @@
-import { ContactForm } from "@/components/contact/ContactForm";
+import { ContactFormBoundary } from "@/components/contact/ContactFormBoundary";
 import { Container } from "@/components/ui/Container";
 import { ChatIcon, ClockIcon } from "@/components/ui/icons";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -15,7 +15,7 @@ export function Contact() {
       className="bg-background-white py-16 lg:py-[100px]"
     >
       <Container className="flex flex-col gap-10 lg:flex-row lg:items-center lg:justify-between lg:gap-15">
-        <div className="flex flex-col gap-8 lg:w-[480px] lg:shrink-0 lg:gap-10">
+        <div className="flex flex-col gap-8 lg:max-w-[480px] lg:min-w-0 lg:flex-1 lg:gap-10">
           <SectionHeading
             id="contact-title"
             eyebrow={contactSection.eyebrow}
@@ -53,8 +53,8 @@ export function Contact() {
           </ul>
         </div>
 
-        <div className="w-full rounded-2xl border border-line-1 bg-background-white p-6 shadow-[0_12px_16px_rgba(23,27,44,0.04)] sm:p-10 lg:w-[540px] lg:shrink-0">
-          <ContactForm />
+        <div className="w-full rounded-2xl border border-line-1 bg-background-white p-6 shadow-[0_12px_16px_rgba(23,27,44,0.04)] sm:p-10 lg:max-w-[540px] lg:min-w-0 lg:flex-1">
+          <ContactFormBoundary />
         </div>
       </Container>
     </section>

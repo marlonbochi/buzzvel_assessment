@@ -7,7 +7,7 @@ export function Footer() {
   return (
     <footer className="bg-background-darkblue pt-15 pb-8 text-text-white-tertiary lg:pt-20 lg:pb-10">
       <Container>
-        <div className="grid grid-cols-2 gap-x-8 gap-y-12 md:grid-cols-[minmax(0,1.3fr)_repeat(3,minmax(0,1fr))] lg:grid-cols-[416px_repeat(3,208px)]">
+        <div className="grid grid-cols-2 gap-x-8 gap-y-12 md:grid-cols-[minmax(0,1.3fr)_repeat(3,minmax(0,1fr))] lg:grid-cols-[minmax(0,416px)_repeat(3,minmax(0,208px))] lg:justify-between">
           <div className="col-span-2 md:col-span-1">
             <Logo tone="light" />
             <p className="mt-3 max-w-[280px] text-base leading-6 lg:max-w-[240px]">

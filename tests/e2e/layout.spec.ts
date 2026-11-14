@@ -33,7 +33,7 @@ test("has exactly one h1 and the expected metadata", async ({ page }) => {
 
 test("never scrolls horizontally, from 320px to 1440px", async ({ page }) => {
   expect(await overflowX(page)).toBe(0);
-  for (const width of [320, 1440]) {
+  for (const width of [320, 1024, 1100, 1152, 1200, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     expect(await overflowX(page), `overflow at ${width}px`).toBe(0);
   }
