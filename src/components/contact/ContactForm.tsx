@@ -37,7 +37,9 @@ function readValues(form: HTMLFormElement) {
 export function ContactForm({ action = submitContact }: ContactFormProps) {
   const [state, formAction, isPending] = useActionState(action, initialContactState);
   const [clientErrors, setClientErrors] = useState<ContactFieldErrors>({});
-  const [serverErrors, setServerErrors] = useState<ContactFieldErrors>({});
+  // Seeded from the initial state: without JavaScript, the server renders the action's result
+  // as the first state, so its errors must show on the very first render.
+  const [serverErrors, setServerErrors] = useState<ContactFieldErrors>(state.errors);
   const [touched, setTouched] = useState<Partial<Record<ContactField, boolean>>>({});
   const [attempted, setAttempted] = useState(false);
   const [seenState, setSeenState] = useState(state);

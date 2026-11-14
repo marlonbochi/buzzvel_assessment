@@ -11,10 +11,9 @@ const navLinkClass =
 /** Sticky site header (Figma 15:116 desktop, 2:4199 mobile). */
 export function Header() {
   return (
-    <header
-      id="top"
-      className="sticky top-0 z-40 border-b border-line-1 bg-background-light-yellow"
-    >
+    // No id="top" here on purpose: "#top" with no matching element scrolls to the very top
+    // (HTML spec), whereas targeting this sticky header would be a no-op once it is stuck.
+    <header className="sticky top-0 z-40 border-b border-line-1 bg-background-light-yellow">
       <Container className="relative flex h-[68px] items-center justify-between lg:h-[69px]">
         <Logo />
 

@@ -12,7 +12,8 @@
     "format": "prettier --write .",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test:stories": "vitest run --project storybook"
+    "test:stories": "vitest run --project storybook",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "next": "16.4.6",
@@ -21,6 +22,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@playwright/test": "1.65.0",
     "@storybook/addon-a11y": "10.6.7",
     "@storybook/addon-vitest": "10.6.7",

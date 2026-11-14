@@ -2,7 +2,7 @@ import { cx } from "@/lib/cx";
 
 type LogoProps = { tone?: "dark" | "light"; className?: string };
 
-/** "luma." wordmark exported from Figma (node 15:119). Links to the top of the page. */
+/** "luma." wordmark exported from Figma (node 15:119). "#top" scrolls to the top of the document. */
 export function Logo({ tone = "dark", className }: LogoProps) {
   return (
     <a
