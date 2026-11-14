@@ -1,4 +1,5 @@
-import { z } from "zod";
+// zod/mini: same validation semantics, tree-shakable — this schema ships to the browser.
+import { z } from "zod/mini";
 
 /** Shared by the client (instant feedback) and the Server Action (source of truth). */
 export const CONTACT_MESSAGES = {
@@ -13,12 +14,11 @@ export const CONTACT_MESSAGES = {
 const M = CONTACT_MESSAGES;
 
 export const contactSchema = z.object({
-  name: z.string().trim().min(2, M.nameRequired).max(80, M.nameTooLong),
-  email: z
+  name: z.string().check(z.trim(), z.minLength(2, M.nameRequired), z.maxLength(80, M.nameTooLong)),
+  email: z.pipe(z.string().check(z.trim()), z.email({ error: M.emailInvalid })),
+  question: z
     .string()
-    .trim()
-    .pipe(z.email({ error: M.emailInvalid })),
-  question: z.string().trim().min(10, M.questionTooShort).max(1000, M.questionTooLong),
+    .check(z.trim(), z.minLength(10, M.questionTooShort), z.maxLength(1000, M.questionTooLong)),
 });
 
 export type ContactInput = z.infer<typeof contactSchema>;

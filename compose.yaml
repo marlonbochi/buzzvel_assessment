@@ -60,3 +60,21 @@ services:
       - /app/node_modules
     command: >-
       sh -c "npm i -g pnpm@10.34.9 --silent && pnpm install --frozen-lockfile && pnpm exec playwright test"
+
+  # Lighthouse CI against the production container: docker compose --profile test run --rm lighthouse
+  # Shares prod's network namespace so the page is audited on http://localhost (a secure context).
+  lighthouse:
+    profiles: ["test"]
+    image: mcr.microsoft.com/playwright:v1.65.0-noble
+    working_dir: /app
+    network_mode: "service:prod"
+    depends_on:
+      prod:
+        condition: service_healthy
+    environment:
+      LHCI_URL: http://localhost:3000/
+      npm_config_store_dir: /tmp/pnpm-store
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: ["sh", "scripts/lhci-docker.sh"]

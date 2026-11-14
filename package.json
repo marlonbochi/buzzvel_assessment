@@ -13,7 +13,8 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test:stories": "vitest run --project storybook",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "lhci": "lhci autorun --config=lighthouserc.mobile.cjs && lhci autorun --config=lighthouserc.desktop.cjs"
   },
   "dependencies": {
     "next": "16.4.6",
@@ -23,6 +24,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
+    "@lhci/cli": "0.16.1",
     "@playwright/test": "1.65.0",
     "@storybook/addon-a11y": "10.6.7",
     "@storybook/addon-vitest": "10.6.7",

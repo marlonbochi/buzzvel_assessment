@@ -68,7 +68,9 @@ export function Hero() {
               src={hero.image.src}
               alt={hero.image.alt}
               fill
-              priority
+              // LCP image. Next 16 deprecates `priority`; eager + high fetch priority is the replacement.
+              loading="eager"
+              fetchPriority="high"
               sizes="(min-width: 1024px) 500px, (min-width: 516px) 484px, calc(100vw - 56px)"
               className="object-cover"
             />
