@@ -27,6 +27,10 @@ Production build, default Lighthouse settings (mobile: simulated Moto G Power on
 Host ports can be changed with `DEV_PORT`, `PROD_PORT` and `STORYBOOK_PORT`
 (for example `DEV_PORT=3001 docker compose up dev`).
 
+`SITE_URL` (default `http://localhost:3000`) is read **at build time** and used for the canonical
+URL, `og:url`, the Open Graph image, `robots.txt` and the sitemap. Set it when building for a real
+domain, for example `SITE_URL=https://luma.example pnpm build`.
+
 - **dev** bind-mounts the source with polling enabled, so edits on macOS/Windows reload instantly.
 - **prod** is a multi-stage build using `output: "standalone"`. The final image runs as a non-root user,
   has a healthcheck and contains only `next`, `react` and `react-dom` at runtime (~200 MB image).
@@ -58,15 +62,23 @@ pnpm build && pnpm start   # production server (standalone output)
 
 ## Testing
 
-| Layer       | Tool                                     | Count                      | What it proves                                                                                                                                                                                      |
-| ----------- | ---------------------------------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Unit        | Vitest + Testing Library                 | 69                         | Content rules, primitives, mobile menu (Esc, focus trap, scroll lock), form validation and states, schema edge cases, Server Action                                                                 |
-| Components  | Storybook 10 + addon-vitest + addon-a11y | 50 stories                 | Every component and section renders at mobile/tablet/desktop with **zero axe violations**. Play functions cover the menu and form                                                                   |
-| End-to-end  | Playwright + @axe-core/playwright        | 103 (17 skipped by design) | Every anchor click, mobile menu by touch and keyboard, form with and without JavaScript, hover/focus, reduced motion, no horizontal scroll from 320 to 1440px, no console errors or failed requests |
-| Performance | Lighthouse CI                            | 6 runs                     | Every category ≥ 95 on mobile and desktop, CLS ≤ 0.1                                                                                                                                                |
+| Layer       | Tool                                     | Count                      | What it proves                                                                                                                                                                                                   |
+| ----------- | ---------------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Unit        | Vitest + Testing Library                 | 71                         | Content rules, primitives, mobile menu (Esc, focus trap, scroll lock), form validation and states, failed-request recovery, schema edge cases, Server Action                                                     |
+| Components  | Storybook 10 + addon-vitest + addon-a11y | 51 stories                 | Every component and section renders at mobile/tablet/desktop with **zero axe violations**. Play functions cover the menu and form                                                                                |
+| End-to-end  | Playwright + @axe-core/playwright        | 103 (17 skipped by design) | Every anchor click, mobile menu by touch and keyboard, form with and without JavaScript, hover/focus, reduced motion, no horizontal scroll at 320–1440px (incl. 1024–1200), no console errors or failed requests |
+| Performance | Lighthouse CI                            | 6 runs                     | Every category ≥ 95 on mobile and desktop, CLS ≤ 0.1                                                                                                                                                             |
 
 The 17 skips are intentional: the hamburger-menu specs don't run on desktop, and the hover-only
 specs run on desktop only.
+
+### Continuous integration
+
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on every pull request and on `main`, as
+five parallel jobs: lint + typecheck + Prettier + unit tests, Storybook story tests (plus a static
+Storybook build), the Playwright suite, the Lighthouse budgets, and a build of the production Docker
+image that must report healthy and serve the page. Lighthouse runs on shared GitHub runners, so its
+scores can be a few points noisier than on a local machine.
 
 ---
 
@@ -111,6 +123,10 @@ specs run on desktop only.
 - **Contact form**: a `useActionState` + Server Action, with a **shared zod schema** (`zod/mini`, to keep the
   client bundle small) validating on both sides. It works **without JavaScript** (progressive
   enhancement, covered by e2e). Submission is simulated with a short delay; nothing is sent anywhere.
+  If the request itself fails (offline, or a stale action after a redeploy), a small error boundary
+  remounts the form with the typed values and an inline "couldn't send" message instead of letting
+  React replace the page with the error screen. While sending, the button is `aria-disabled` rather
+  than `disabled`, so keyboard focus stays on it.
 - **Images** were exported from Figma, compressed (412 KB total), and served through `next/image` as
   AVIF/WebP. Only the hero image (the LCP element) loads eagerly with high priority.
   The "people" collage uses container-query units so it scales proportionally down to 320px.
@@ -138,6 +154,11 @@ specs run on desktop only.
 - Placeholder `#` links and the Lorem ipsum text listed above.
 - The contact form does not deliver messages (no backend, as allowed by the brief).
 - Not tested on real Safari/iOS hardware yet. Automated runs use Chromium with mobile emulation.
+- Small things noted in review and left for later: a field shows its error when you tab past it
+  empty; the success message stays until the next submit; opening `/#contact` animates the smooth
+  scroll on load; while the mobile menu is open the page behind it is not `inert` (Tab is trapped,
+  but a screen reader's virtual cursor can leave the menu); without JavaScript the hamburger does
+  nothing (the footer links still work).
 
 ## Time spent
 
@@ -163,8 +184,10 @@ I used **Claude Code** (Claude Opus) as a pair programmer, following a structure
   in an accessible name, two contrast failures, server errors not rendering without JavaScript, the logo
   not scrolling to the top under a sticky header, and a footer overflow at 768px.
 - Screenshots of every breakpoint were compared side by side with the Figma exports.
-- A final whole-branch code review was run before submission, and every change was read and understood
-  before being committed.
+- A separate review agent then reviewed the whole branch. It found a horizontal overflow between
+  1024 and ~1215px, a page crash when the form request fails, no maximum email length, and focus
+  dropping to `<body>` after submit. Each was fixed test-first (the test failed before the fix).
+  Every change was read and understood before being committed.
 
 ---
 
@@ -176,11 +199,12 @@ src/
   components/
     ui/           Button, ButtonLink, Chip, Eyebrow, SectionHeading, AvatarStack, Container, icons
     layout/       Header, MobileNav (client), Footer, Logo
-    contact/      ContactForm (client), FormField
+    contact/      ContactForm (client), ContactFormBoundary, FormField
     sections/     Hero, Categories, FeaturedCourse, HowItWorks, Testimonial, People, Contact, FinalCta
   content/        typed copy and image metadata
   lib/            contact schema/state, fonts, site URL
 tests/
   unit/           Vitest
   e2e/            Playwright
+.github/workflows/ci.yml   CI pipeline
 ```
