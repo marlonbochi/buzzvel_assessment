@@ -28,7 +28,7 @@ export const Pending: Story = {
   args: { pending: true, pendingLabel: "Sending…" },
   play: async ({ canvasElement }) => {
     const button = within(canvasElement).getByRole("button", { name: "Sending…" });
-    await expect(button).toBeDisabled();
+    await expect(button).toHaveAttribute("aria-disabled", "true");
     await expect(button).toHaveAttribute("aria-busy", "true");
   },
 };

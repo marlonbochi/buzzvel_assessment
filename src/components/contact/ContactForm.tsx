@@ -3,9 +3,11 @@
 import { useActionState, useEffect, useRef, useState, type FormEvent } from "react";
 import { submitContact } from "@/app/actions/contact";
 import { Button } from "@/components/ui/Button";
+import { cx } from "@/lib/cx";
 import { contactForm } from "@/content";
 import {
   CONTACT_FIELDS,
+  type ContactInput,
   CONTACT_MESSAGES,
   validateContact,
   type ContactField,
@@ -17,6 +19,12 @@ import { FormField } from "./FormField";
 type ContactFormProps = {
   /** Injectable for tests and stories; defaults to the real Server Action. */
   action?: (prev: ContactFormState, data: FormData) => Promise<ContactFormState>;
+  /** Values to restore, e.g. after a failed submission (see ContactFormBoundary). */
+  initialValues?: Partial<ContactInput>;
+  /** The previous attempt failed before reaching the server: show the error, focus the button. */
+  failed?: boolean;
+  /** Called with the values right before a valid submission is sent. */
+  onSubmitValues?: (values: Record<ContactField, string>) => void;
 };
 
 const fieldConfig = {
@@ -34,8 +42,17 @@ function readValues(form: HTMLFormElement) {
  * Validates on the client for instant feedback, then posts to the Server Action, which validates
  * again. Without JavaScript the form still posts and renders the server's errors or success.
  */
-export function ContactForm({ action = submitContact }: ContactFormProps) {
-  const [state, formAction, isPending] = useActionState(action, initialContactState);
+export function ContactForm({
+  action = submitContact,
+  initialValues,
+  failed = false,
+  onSubmitValues,
+}: ContactFormProps) {
+  const [state, formAction, isPending] = useActionState(
+    action,
+    initialValues ? { ...initialContactState, values: initialValues } : initialContactState,
+  );
+  const submitRef = useRef<HTMLButtonElement>(null);
   const [clientErrors, setClientErrors] = useState<ContactFieldErrors>({});
   // Seeded from the initial state: without JavaScript, the server renders the action's result
   // as the first state, so its errors must show on the very first render.
@@ -61,6 +78,13 @@ export function ContactForm({ action = submitContact }: ContactFormProps) {
     submittingRef.current = false;
   }, [state]);
 
+  // Remounted after a failed attempt: put keyboard focus back where the user left it.
+  useEffect(() => {
+    if (failed) submitRef.current?.focus();
+  }, [failed]);
+
+  const showFailure = failed && state.status === "idle" && !isPending;
+
   const errors: ContactFieldErrors = { ...serverErrors, ...clientErrors };
 
   const revalidate = (form: HTMLFormElement, field: ContactField, force: boolean) => {
@@ -82,7 +106,8 @@ export function ContactForm({ action = submitContact }: ContactFormProps) {
       return;
     }
     const form = event.currentTarget;
-    const result = validateContact(readValues(form));
+    const values = readValues(form);
+    const result = validateContact(values);
     setAttempted(true);
     if (!result.success) {
       event.preventDefault();
@@ -93,6 +118,7 @@ export function ContactForm({ action = submitContact }: ContactFormProps) {
     }
     setClientErrors({});
     submittingRef.current = true;
+    onSubmitValues?.(values as Record<ContactField, string>);
   };
 
   return (
@@ -139,12 +165,28 @@ export function ContactForm({ action = submitContact }: ContactFormProps) {
         ))}
       </div>
 
-      <Button type="submit" block="always" pending={isPending} pendingLabel={contactForm.pending}>
+      <Button
+        ref={submitRef}
+        type="submit"
+        block="always"
+        pending={isPending}
+        pendingLabel={contactForm.pending}
+      >
         {contactForm.submit}
       </Button>
 
-      <p role="status" className="text-sm leading-6 font-semibold text-[#1d7a46]">
-        {state.status === "success" && !isPending ? CONTACT_MESSAGES.success : ""}
+      <p
+        role="status"
+        className={cx(
+          "text-sm leading-6 font-semibold",
+          showFailure ? "text-error" : "text-[#1d7a46]",
+        )}
+      >
+        {showFailure
+          ? CONTACT_MESSAGES.sendFailed
+          : state.status === "success" && !isPending
+            ? CONTACT_MESSAGES.success
+            : ""}
       </p>
     </form>
   );

@@ -57,8 +57,13 @@ test.describe("with JavaScript", () => {
     const f = form(page);
     await fillValid(page);
     await f.submit.click();
-    await expect(page.getByRole("button", { name: "Sending…" })).toBeDisabled();
+    await expect(page.getByRole("button", { name: "Sending…" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
     await expect(f.status).toHaveText(SUCCESS);
+    // Keyboard users keep their place: focus stays on the button, not <body>.
+    await expect(f.submit).toBeFocused();
     await expect(f.name).toHaveValue("");
     await expect(f.email).toHaveValue("");
     await expect(f.question).toHaveValue("");

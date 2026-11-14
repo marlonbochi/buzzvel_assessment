@@ -6,16 +6,22 @@ export const CONTACT_MESSAGES = {
   nameRequired: "Please enter your full name.",
   nameTooLong: "Name must be 80 characters or fewer.",
   emailInvalid: "Please enter a valid email address.",
+  emailTooLong: "Email must be 254 characters or fewer.",
   questionTooShort: "Please tell us a bit more (at least 10 characters).",
   questionTooLong: "Question must be 1000 characters or fewer.",
   success: "Thanks! We'll get back to you within 24 hours.",
+  sendFailed: "We couldn't send your message. Check your connection and try again.",
 } as const;
 
 const M = CONTACT_MESSAGES;
 
 export const contactSchema = z.object({
   name: z.string().check(z.trim(), z.minLength(2, M.nameRequired), z.maxLength(80, M.nameTooLong)),
-  email: z.pipe(z.string().check(z.trim()), z.email({ error: M.emailInvalid })),
+  // 254 is the practical maximum length of an address (RFC 5321 path limit).
+  email: z.pipe(
+    z.string().check(z.trim(), z.maxLength(254, M.emailTooLong)),
+    z.email({ error: M.emailInvalid }),
+  ),
   question: z
     .string()
     .check(z.trim(), z.minLength(10, M.questionTooShort), z.maxLength(1000, M.questionTooLong)),

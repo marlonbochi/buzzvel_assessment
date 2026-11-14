@@ -54,3 +54,15 @@ test("only the first message per field is reported", () => {
   if (!result.success)
     expect(Object.keys(result.errors).sort()).toEqual(["email", "name", "question"]);
 });
+
+test("Review Focus 1: an email longer than 254 characters is rejected", () => {
+  const long = `${"a".repeat(250)}@x.io`; // 255 characters
+  expect(validateContact({ ...valid, email: long })).toEqual({
+    success: false,
+    errors: { email: M.emailTooLong },
+  });
+  expect(validateContact({ ...valid, email: `${"a".repeat(3000)}@example.com` })).toEqual({
+    success: false,
+    errors: { email: M.emailTooLong },
+  });
+});

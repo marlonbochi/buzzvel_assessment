@@ -56,7 +56,12 @@ export const Pending: Story = {
     await userEvent.type(canvas.getByLabelText("Email"), "maya@example.com");
     await userEvent.type(canvas.getByLabelText("Your question"), "Which course should I take?");
     await userEvent.click(canvas.getByRole("button", { name: "Send message" }));
-    await waitFor(() => expect(canvas.getByRole("button", { name: "Sending…" })).toBeDisabled());
+    await waitFor(() =>
+      expect(canvas.getByRole("button", { name: "Sending…" })).toHaveAttribute(
+        "aria-disabled",
+        "true",
+      ),
+    );
     await expect(canvas.getByRole("button", { name: "Sending…" })).toHaveAttribute(
       "aria-busy",
       "true",
@@ -96,4 +101,22 @@ export const FieldStates: StoryObj<typeof FormField> = {
       />
     </div>
   ),
+};
+
+/** What ContactFormBoundary renders after the request itself failed (offline, stale action). */
+export const SendFailed: Story = {
+  args: {
+    failed: true,
+    initialValues: {
+      name: "Maya Chen",
+      email: "maya@example.com",
+      question: "Which course should I take?",
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole("status")).toHaveTextContent(CONTACT_MESSAGES.sendFailed);
+    await expect(canvas.getByLabelText("Full name")).toHaveValue("Maya Chen");
+    await expect(canvas.getByRole("button", { name: "Send message" })).toHaveFocus();
+  },
 };

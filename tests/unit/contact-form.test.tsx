@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ContactForm } from "@/components/contact/ContactForm";
+import { ContactFormBoundary } from "@/components/contact/ContactFormBoundary";
 import { CONTACT_MESSAGES as M } from "@/lib/contact-schema";
 import type { ContactFormState } from "@/lib/contact-state";
 
@@ -69,8 +70,10 @@ test("valid submit calls the action once, shows pending, then success and resets
   await user.click(submit());
 
   await waitFor(() => expect(submit()).toHaveTextContent("Sending…"));
-  expect(submit()).toBeDisabled();
+  // aria-disabled, not disabled: a natively disabled button drops keyboard focus to <body>.
+  expect(submit()).toHaveAttribute("aria-disabled", "true");
   expect(submit()).toHaveAttribute("aria-busy", "true");
+  expect(submit()).not.toBeDisabled();
 
   resolve();
   await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent(M.success));
@@ -107,4 +110,25 @@ test("server-side errors are rendered as field errors", async () => {
   await fillValid();
   await user.click(submit());
   await waitFor(() => expect(email()).toHaveAccessibleDescription(M.emailInvalid));
+});
+
+test("a failed submission (network error) shows an inline error and keeps what was typed", async () => {
+  const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+  const user = userEvent.setup();
+  const action = vi.fn<Action>(async () => {
+    throw new TypeError("Failed to fetch");
+  });
+  render(<ContactFormBoundary action={action} />);
+  await user.type(screen.getByLabelText("Full name"), "Maya Chen");
+  await user.type(screen.getByLabelText("Email"), "maya@example.com");
+  await user.type(screen.getByLabelText("Your question"), "Which course should I start with?");
+  await user.click(screen.getByRole("button", { name: "Send message" }));
+
+  await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent(M.sendFailed));
+  expect(action).toHaveBeenCalledTimes(1);
+  expect(screen.getByLabelText("Full name")).toHaveValue("Maya Chen");
+  expect(screen.getByLabelText("Email")).toHaveValue("maya@example.com");
+  expect(screen.getByLabelText("Your question")).toHaveValue("Which course should I start with?");
+  expect(screen.getByRole("button", { name: "Send message" })).toHaveFocus();
+  consoleError.mockRestore();
 });

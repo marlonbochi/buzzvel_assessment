@@ -8,15 +8,16 @@ import { AvatarStack } from "@/components/ui/AvatarStack";
 import { ArrowRightIcon, StarIcon } from "@/components/ui/icons";
 
 describe("Button", () => {
-  test("pending state shows the pending label, disables the button and marks it busy", () => {
+  test("pending state shows the pending label and marks it busy and aria-disabled, keeping focusability", () => {
     render(
       <Button pending pendingLabel="Sending…">
         Send message
       </Button>,
     );
     const button = screen.getByRole("button", { name: "Sending…" });
-    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute("aria-disabled", "true");
     expect(button).toHaveAttribute("aria-busy", "true");
+    expect(button).not.toBeDisabled();
   });
 
   test("defaults to type=button so it never submits a form by accident", () => {

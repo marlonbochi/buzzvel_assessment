@@ -8,7 +8,7 @@ const base =
   "inline-flex items-center justify-center gap-2 rounded-lg font-inter font-bold whitespace-nowrap " +
   "transition-[background-color,border-color,color,box-shadow,transform] duration-200 motion-reduce:transition-none " +
   "focus-visible:outline-2 focus-visible:outline-offset-2 " +
-  "disabled:cursor-not-allowed disabled:opacity-70";
+  "disabled:cursor-not-allowed disabled:opacity-70 aria-disabled:cursor-wait aria-disabled:opacity-70";
 
 const variants: Record<ButtonVariant, string> = {
   primary:
