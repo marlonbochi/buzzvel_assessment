@@ -54,6 +54,7 @@ test("every image exists and has a meaningful alt text", () => {
 test("in-page anchors match spec §7.11", () => {
   expect(c.primaryNav.find((l) => l.label === "Courses")?.href).toBe("#courses");
   expect(c.primaryNav.find((l) => l.label === "Community")?.href).toBe("#people");
+  expect(c.primaryNav.find((l) => l.label === "About")?.href).toBe("#how-it-works");
   expect(c.hero.primaryCta.href).toBe("#courses");
   expect(c.hero.secondaryCta.href).toBe("#how-it-works");
   expect(c.featuredCourse.secondaryCta.href).toBe("#courses");
@@ -62,6 +63,7 @@ test("in-page anchors match spec §7.11", () => {
   const footerLinks = c.footer.columns.flatMap((col) => col.links);
   expect(footerLinks.find((l) => l.label === "Contact")?.href).toBe("#contact");
   expect(footerLinks.find((l) => l.label === "Instructors")?.href).toBe("#people");
+  expect(footerLinks.find((l) => l.label === "About")?.href).toBe("#how-it-works");
 });
 
 test("footer columns match the design", () => {

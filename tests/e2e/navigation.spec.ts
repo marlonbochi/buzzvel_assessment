@@ -64,6 +64,13 @@ const CASES: Case[] = [
   {
     where: "footer",
     scope: (p) => p.getByRole("contentinfo"),
+    link: "About",
+    hash: "#how-it-works",
+    target: "Less browsing. More learning.",
+  },
+  {
+    where: "footer",
+    scope: (p) => p.getByRole("contentinfo"),
     link: "Contact",
     hash: "#contact",
     target: "Get in touch",
@@ -90,10 +97,11 @@ for (const c of CASES) {
   });
 }
 
-test("header navigation reaches Courses and Community", async ({ page }, testInfo) => {
+test("header navigation reaches Courses, Community and About", async ({ page }, testInfo) => {
   for (const [name, hash, heading] of [
     ["Courses", "#courses", "Learn something worth knowing."],
     ["Community", "#people", "Meet international students & teachers"],
+    ["About", "#how-it-works", "Less browsing. More learning."],
   ] as const) {
     await page.goto("/");
     if (!isDesktop(testInfo.project.name)) {

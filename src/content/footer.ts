@@ -15,7 +15,7 @@ export const footer: { tagline: string; columns: FooterColumn[]; copyright: stri
     {
       title: "Company",
       links: [
-        { label: "About", href: "#" },
+        { label: "About", href: "#how-it-works" },
         { label: "Careers", href: "#" },
         { label: "Journal", href: "#" },
       ],

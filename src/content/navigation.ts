@@ -5,7 +5,7 @@ export const primaryNav: Link[] = [
   { label: "Courses", href: "#courses" },
   { label: "For Teams", href: "#" },
   { label: "Community", href: "#people" },
-  { label: "About", href: "#" },
+  { label: "About", href: "#how-it-works" },
 ];
 
 export const headerActions: { login: Link; cta: Link } = {

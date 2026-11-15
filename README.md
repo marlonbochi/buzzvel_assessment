@@ -105,9 +105,10 @@ scores can be a few points noisier than on a local machine.
   backgrounds). The form error red `#c4321f` and success green `#1d7a46` are new colors, both AA.
 - **Sticky header**: chosen so navigation stays reachable on a long page. Every anchored section has
   `scroll-margin-top` so it lands below the header.
-- **Links without a destination** (For Teams, About, Log in, Start learning, Join Luma, View course,
+- **Links without a destination** (For Teams, Log in, Start learning, Join Luma, View course,
   category "Explore", Careers, Journal, Help Center, Terms, Privacy) point to `#`. Links that have a
-  matching section scroll to it.
+  matching section scroll to it: Community and Instructors go to "The people", and About goes to
+  "How it works".
 
 ### Accessibility over pixel-perfection (two tiny color deviations)
 
