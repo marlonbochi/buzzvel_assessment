@@ -117,6 +117,7 @@ jobs:
           target: runner
           tags: luma:ci
           load: true
+          build-args: SITE_URL=https://luma.example.com
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Start it and wait for the healthcheck
@@ -130,6 +131,11 @@ jobs:
           done
           [ "$status" = "healthy" ]
           curl -fsS http://localhost:8080/ | grep -q "Build skills that actually move you forward"
+      - name: SITE_URL build arg reaches canonical, robots and sitemap
+        run: |
+          curl -fsS http://localhost:8080/ | grep -q 'rel="canonical" href="https://luma.example.com'
+          curl -fsS http://localhost:8080/robots.txt | grep -q "Sitemap: https://luma.example.com/sitemap.xml"
+          curl -fsS http://localhost:8080/sitemap.xml | grep -q "<loc>https://luma.example.com/</loc>"
       - name: Container logs
         if: always()
         run: docker logs luma || true

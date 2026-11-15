@@ -12,3 +12,25 @@ test("sitemap lists the single page at the site URL", () => {
   expect(entries).toHaveLength(1);
   expect(entries[0]?.url).toBe("http://localhost:3000/");
 });
+
+describe("siteUrl", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  // site.ts reads the env once at import time, so each case needs a fresh module.
+  const load = async () => {
+    vi.resetModules();
+    return (await import("@/lib/site")).siteUrl;
+  };
+
+  test("uses SITE_URL without a trailing slash", async () => {
+    vi.stubEnv("SITE_URL", "https://luma.example.com/");
+    expect(await load()).toBe("https://luma.example.com");
+  });
+
+  test("falls back to localhost when SITE_URL is empty (e.g. an unset Docker build arg)", async () => {
+    vi.stubEnv("SITE_URL", "");
+    expect(await load()).toBe("http://localhost:3000");
+  });
+});

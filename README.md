@@ -29,7 +29,9 @@ Host ports can be changed with `DEV_PORT`, `PROD_PORT` and `STORYBOOK_PORT`
 
 `SITE_URL` (default `http://localhost:3000`) is read **at build time** and used for the canonical
 URL, `og:url`, the Open Graph image, `robots.txt` and the sitemap. Set it when building for a real
-domain, for example `SITE_URL=https://luma.example pnpm build`.
+domain: `SITE_URL=https://luma.example.com pnpm build` locally, or
+`SITE_URL=https://luma.example.com docker compose up --build prod` with Docker (compose passes it to
+the image as a build arg and defaults to `http://localhost:8080`, where `prod` is published).
 
 - **dev** bind-mounts the source with polling enabled, so edits on macOS/Windows reload instantly.
 - **prod** is a multi-stage build using `output: "standalone"`. The final image runs as a non-root user,
@@ -64,7 +66,7 @@ pnpm build && pnpm start   # production server (standalone output)
 
 | Layer       | Tool                                     | Count                      | What it proves                                                                                                                                                                                                   |
 | ----------- | ---------------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Unit        | Vitest + Testing Library                 | 71                         | Content rules, primitives, mobile menu (Esc, focus trap, scroll lock), form validation and states, failed-request recovery, schema edge cases, Server Action                                                     |
+| Unit        | Vitest + Testing Library                 | 73                         | Content rules, primitives, mobile menu (Esc, focus trap, scroll lock), form validation and states, failed-request recovery, schema edge cases, Server Action                                                     |
 | Components  | Storybook 10 + addon-vitest + addon-a11y | 51 stories                 | Every component and section renders at mobile/tablet/desktop with **zero axe violations**. Play functions cover the menu and form                                                                                |
 | End-to-end  | Playwright + @axe-core/playwright        | 103 (17 skipped by design) | Every anchor click, mobile menu by touch and keyboard, form with and without JavaScript, hover/focus, reduced motion, no horizontal scroll at 320–1440px (incl. 1024–1200), no console errors or failed requests |
 | Performance | Lighthouse CI                            | 6 runs                     | Every category ≥ 95 on mobile and desktop, CLS ≤ 0.1                                                                                                                                                             |

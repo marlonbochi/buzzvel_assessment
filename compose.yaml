@@ -36,6 +36,9 @@ services:
     build:
       context: .
       target: runner
+      args:
+        # Baked in at build time; defaults to the URL this service is published on.
+        SITE_URL: ${SITE_URL:-http://localhost:8080}
     ports:
       - "${PROD_PORT:-8080}:3000"
     environment:

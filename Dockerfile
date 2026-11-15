@@ -22,6 +22,10 @@ CMD ["pnpm", "dev", "--hostname", "0.0.0.0", "--port", "3000"]
 
 # ---------- builder: production build (standalone output) ----------
 FROM deps AS builder
+# Public origin baked into canonical, Open Graph, robots.txt and sitemap.xml at build time.
+# Example: docker compose build --build-arg SITE_URL=https://luma.example.com prod
+ARG SITE_URL=http://localhost:3000
+ENV SITE_URL=${SITE_URL}
 COPY . .
 RUN pnpm build
 
