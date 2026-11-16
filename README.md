@@ -130,13 +130,25 @@ integration:
 
 ### The design had a few inconsistencies
 
-| Finding in Figma                                                                   | Decision                                       |
-| ---------------------------------------------------------------------------------- | ---------------------------------------------- |
-| Desktop "How it works" labels all three steps **STEP 01**                          | Used STEP 01 / 02 / 03, as in the mobile frame |
-| The mobile contact form is **in Portuguese** ("Nome completo", "Enviar mensagem"…) | Used the desktop English copy everywhere       |
-| Step 2 copy differs between frames ("who use" vs "who actually use")               | Used the desktop text                          |
-| "The people" body text is Lorem ipsum                                              | Kept as designed (content to be supplied)      |
-| Token names contain a typo (`backgrounnd-*`)                                       | Corrected to `background-*` in code            |
+| Finding in Figma                                                                         | Decision                                                                      |
+| ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Desktop "How it works" labels all three steps **STEP 01**                                | Used STEP 01 / 02 / 03, as in the mobile frame                                |
+| The mobile contact form is **in Portuguese** ("Nome completo", "Enviar mensagem"…)       | Used the desktop English copy everywhere                                      |
+| Step 2 copy differs between frames ("who use" vs "who actually use")                     | Used the desktop text                                                         |
+| "The people" body text is Lorem ipsum                                                    | Kept as designed (content to be supplied)                                     |
+| Token names contain a typo (`backgrounnd-*`)                                             | Corrected to `background-*` in code                                           |
+| Mobile step 2 icon tile is a paler orange than on desktop                                | Used the desktop color on both                                                |
+| Mobile "The people" body text is dark; on desktop it is grey (`text-secondary`)          | Used the desktop grey on both                                                 |
+| Mobile contact description is 14px, while every other mobile section description is 16px | Kept 16px, consistent with the rest of the page                               |
+| Mobile collage is wider and shorter than the desktop one scaled down                     | Kept one collage that scales with the container (about 37px taller on mobile) |
+| Mobile form textarea is 100px tall, desktop 120px; mobile form card padding is 20/24px   | Followed each frame at its breakpoint                                         |
+
+**Matching the PNG exports.** The live page was screenshotted at 1280px and 402px (the two frame
+widths, at 2× like the exports) and compared with the Figma PNGs section by section. Desktop is
+5696px tall against 5691px in Figma, with every section within ±2px. Mobile is within ±9px per
+section except the collage noted above. Two systematic details made that possible: Figma's mobile
+frame uses 14px for buttons and secondary text, and Figma draws borders _inside_ the box, so
+buttons and inputs have fixed heights (52px and 48px) with the border counted inside.
 
 ### Things the design doesn't specify
 
@@ -231,7 +243,9 @@ I used **Claude Code** (Claude Opus) as a pair programmer, following a structure
 - The unit, story, e2e and Lighthouse suites above. Several real bugs were caught this way: a lost space
   in an accessible name, two contrast failures, server errors not rendering without JavaScript, the logo
   not scrolling to the top under a sticky header, and a footer overflow at 768px.
-- Screenshots of every breakpoint were compared side by side with the Figma exports.
+- Screenshots of the live page were compared side by side with the Figma PNG exports, section by
+  section at both frame widths, and the spacing and type sizes were corrected until each section
+  matched within a few pixels (see "Matching the PNG exports" above).
 - A separate review agent then reviewed the whole branch. It found a horizontal overflow between
   1024 and ~1215px, a page crash when the form request fails, no maximum email length, and focus
   dropping to `<body>` after submit. Each was fixed test-first (the test failed before the fix).
