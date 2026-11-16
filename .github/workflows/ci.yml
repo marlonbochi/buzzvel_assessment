@@ -1,0 +1,141 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NEXT_TELEMETRY_DISABLED: "1"
+
+jobs:
+  quality:
+    name: Lint, types, format and unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm format:check
+      - run: pnpm test
+
+  stories:
+    name: Storybook stories (browser + axe)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:stories
+      - run: pnpm build-storybook --quiet
+
+  e2e:
+    name: End-to-end (mobile, tablet, desktop)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      # Playwright's webServer builds the app and starts the production server on :3100.
+      - run: pnpm test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
+          retention-days: 7
+
+  lighthouse:
+    name: Lighthouse budgets (mobile + desktop)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: Start the production server
+        run: |
+          PORT=3000 pnpm start > server.log 2>&1 &
+          npx --yes wait-on@8 --timeout 60000 http://localhost:3000/
+          # Warm up: the first request after boot is slower and would skew the first audit.
+          for i in 1 2 3; do curl -fsS -o /dev/null http://localhost:3000/; done
+      - run: pnpm lhci
+        env:
+          LHCI_URL: http://localhost:3000/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci
+          include-hidden-files: true
+          retention-days: 7
+
+  docker:
+    name: Production Docker image
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build the runner image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: runner
+          tags: luma:ci
+          load: true
+          build-args: SITE_URL=https://luma.example.com
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Start it and wait for the healthcheck
+        run: |
+          docker run -d --name luma -p 8080:3000 luma:ci
+          for i in $(seq 1 30); do
+            status="$(docker inspect -f '{{.State.Health.Status}}' luma)"
+            echo "health: $status"
+            [ "$status" = "healthy" ] && break
+            sleep 2
+          done
+          [ "$status" = "healthy" ]
+          curl -fsS http://localhost:8080/ | grep -q "Build skills that actually move you forward"
+      - name: SITE_URL build arg reaches canonical, robots and sitemap
+        run: |
+          curl -fsS http://localhost:8080/ | grep -q 'rel="canonical" href="https://luma.example.com'
+          curl -fsS http://localhost:8080/robots.txt | grep -q "Sitemap: https://luma.example.com/sitemap.xml"
+          curl -fsS http://localhost:8080/sitemap.xml | grep -q "<loc>https://luma.example.com/</loc>"
+      - name: Container logs
+        if: always()
+        run: docker logs luma || true

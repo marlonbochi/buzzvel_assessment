@@ -263,10 +263,10 @@ A "Skip to content" link is the first focusable element.
 
 - Anchors are used wherever a matching section exists:
   - Courses, Categories, "Explore courses", "Browse all courses", "Explore all courses" → `#courses`
-  - "See how it works" → `#how-it-works`
+  - "See how it works", About (header and footer) → `#how-it-works`
   - Community, "Explore teachers and students", Instructors → `#people`
   - Contact → `#contact`
-- Everything else (For Teams, About, Log in, Start learning, Join Luma, View course, category "Explore" links, Careers, Journal, Help Center, Terms, Privacy) goes to `#` placeholders. They are listed in the README as known gaps.
+- Everything else (For Teams, Log in, Start learning, Join Luma, View course, category "Explore" links, Careers, Journal, Help Center, Terms, Privacy) goes to `#` placeholders. They are listed in the README as known gaps.
 - Smooth scrolling is applied only when `prefers-reduced-motion: no-preference`.
 
 ## 8. Code architecture

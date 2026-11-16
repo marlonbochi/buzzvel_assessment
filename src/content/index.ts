@@ -1,0 +1,11 @@
+export * from "./types";
+export { primaryNav, headerActions } from "./navigation";
+export { hero } from "./hero";
+export { categoriesSection, categories } from "./categories";
+export { featuredCourse } from "./featured-course";
+export { howItWorksSection, steps } from "./how-it-works";
+export { testimonial, stats } from "./testimonial";
+export { people } from "./people";
+export { contactSection, contactInfo, contactForm } from "./contact";
+export { finalCta } from "./final-cta";
+export { footer } from "./footer";

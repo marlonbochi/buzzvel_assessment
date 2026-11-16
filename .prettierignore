@@ -1,0 +1,7 @@
+pnpm-lock.yaml
+.next
+node_modules
+docs/superpowers
+.superpowers
+design
+.pnpm-store

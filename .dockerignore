@@ -1,0 +1,13 @@
+node_modules
+.next
+.git
+design
+.superpowers
+storybook-static
+test-results
+playwright-report
+.lighthouseci
+coverage
+*.log
+.DS_Store
+.pnpm-store
