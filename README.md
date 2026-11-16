@@ -4,11 +4,23 @@ A single responsive landing page for **luma.**, a fictional learning platform, b
 [Buzzvel FE Test 2026 Figma design](https://www.figma.com/design/G0zSf6gyynwzEusOCgm2CM/Buzzvel-FE---Test-2026)
 with **Next.js 16 (App Router), TypeScript and Tailwind CSS 4**.
 
+**Live site: <https://buzzvel-assessment.vercel.app>** (deployed from `main` on Vercel, see
+[Deployment](#deployment)).
+
 | Lighthouse — mobile                                         | Lighthouse — desktop                                           |
 | ----------------------------------------------------------- | -------------------------------------------------------------- |
-| ![Mobile: 95 / 100 / 100 / 100](docs/lighthouse/mobile.png) | ![Desktop: 100 / 100 / 100 / 100](docs/lighthouse/desktop.png) |
+| ![Mobile: 98 / 100 / 100 / 100](docs/lighthouse/mobile.png) | ![Desktop: 100 / 100 / 100 / 100](docs/lighthouse/desktop.png) |
 
-Production build, default Lighthouse settings (mobile: simulated Moto G Power on slow 4G), 3 runs each.
+Audited on the live site with default Lighthouse settings (mobile: simulated Moto G Power on slow
+4G), 3 runs per preset; the representative run is shown.
+
+| Live site (3 runs) | Performance | Accessibility | Best practices | SEO | LCP          | TBT      | CLS |
+| ------------------ | ----------- | ------------- | -------------- | --- | ------------ | -------- | --- |
+| Mobile             | 98–100      | 100           | 100            | 100 | 1.8 – 2.3 s  | 27–39 ms | 0   |
+| Desktop            | 100         | 100           | 100            | 100 | 0.44 – 0.5 s | 0 ms     | 0   |
+
+The same budgets also run in CI against a local production build (mobile 95, desktop 100), where
+there is no CDN or Brotli compression.
 
 ---
 
@@ -27,11 +39,12 @@ Production build, default Lighthouse settings (mobile: simulated Moto G Power on
 Host ports can be changed with `DEV_PORT`, `PROD_PORT` and `STORYBOOK_PORT`
 (for example `DEV_PORT=3001 docker compose up dev`).
 
-`SITE_URL` (default `http://localhost:3000`) is read **at build time** and used for the canonical
-URL, `og:url`, the Open Graph image, `robots.txt` and the sitemap. Set it when building for a real
-domain: `SITE_URL=https://luma.example.com pnpm build` locally, or
+`SITE_URL` is read **at build time** and used for the canonical URL, `og:url`, the Open Graph
+image, `robots.txt` and the sitemap. Set it when building for a real domain:
+`SITE_URL=https://luma.example.com pnpm build` locally, or
 `SITE_URL=https://luma.example.com docker compose up --build prod` with Docker (compose passes it to
-the image as a build arg and defaults to `http://localhost:8080`, where `prod` is published).
+the image as a build arg and defaults to `http://localhost:8080`, where `prod` is published). On
+Vercel it is not needed (see [Deployment](#deployment)).
 
 - **dev** bind-mounts the source with polling enabled, so edits on macOS/Windows reload instantly.
 - **prod** is a multi-stage build using `output: "standalone"`. The final image runs as a non-root user,
@@ -66,7 +79,7 @@ pnpm build && pnpm start   # production server (standalone output)
 
 | Layer       | Tool                                     | Count                      | What it proves                                                                                                                                                                                                   |
 | ----------- | ---------------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Unit        | Vitest + Testing Library                 | 73                         | Content rules, primitives, mobile menu (Esc, focus trap, scroll lock), form validation and states, failed-request recovery, schema edge cases, Server Action                                                     |
+| Unit        | Vitest + Testing Library                 | 75                         | Content rules, primitives, mobile menu (Esc, focus trap, scroll lock), form validation and states, failed-request recovery, schema edge cases, Server Action                                                     |
 | Components  | Storybook 10 + addon-vitest + addon-a11y | 51 stories                 | Every component and section renders at mobile/tablet/desktop with **zero axe violations**. Play functions cover the menu and form                                                                                |
 | End-to-end  | Playwright + @axe-core/playwright        | 112 (17 skipped by design) | Every anchor click, mobile menu by touch and keyboard, form with and without JavaScript, hover/focus, reduced motion, no horizontal scroll at 320–1440px (incl. 1024–1200), no console errors or failed requests |
 | Performance | Lighthouse CI                            | 6 runs                     | Every category ≥ 95 on mobile and desktop, CLS ≤ 0.1                                                                                                                                                             |
@@ -82,7 +95,36 @@ Storybook build), the Playwright suite, the Lighthouse budgets, and a build of t
 image that must report healthy and serve the page. Lighthouse runs on shared GitHub runners, so its
 scores can be a few points noisier than on a local machine.
 
+[`.github/workflows/live.yml`](.github/workflows/live.yml) runs the same e2e suite and Lighthouse
+budgets **against the deployed site** after every successful production deploy (see below), and can
+also be started by hand from the Actions tab, optionally against a preview URL.
+
 ---
+
+## Deployment
+
+The site is hosted on **Vercel** at <https://buzzvel-assessment.vercel.app>, through Vercel's GitHub
+integration:
+
+- **`main` is production.** Every merge to `main` builds and deploys automatically; other branches
+  get preview deployments (Vercel's default). The repository needs no Vercel config file: Vercel detects Next.js and
+  runs `pnpm install` and `next build` (pnpm version from `packageManager`, Node 22 from `engines`).
+- **The contact form works there as it does locally.** The Server Action runs as a Vercel Function,
+  and the no-JavaScript form post works too (covered by the e2e suite against the live URL).
+- **Static by default.** The page is prerendered at build time and served from Vercel's CDN
+  (`x-nextjs-prerender: 1`, cache `HIT`), so a visit doesn't run any server code until the form is
+  submitted.
+- **Canonical URLs.** When `SITE_URL` isn't set, the build uses Vercel's
+  `VERCEL_PROJECT_PRODUCTION_URL`, so canonical, Open Graph, `robots.txt` and the sitemap point at
+  the production domain, including on preview deployments (which keeps search engines on
+  production). The order is `SITE_URL` → Vercel production domain → `http://localhost:3000`.
+- **Checked after every deploy.** Vercel reports each deployment to GitHub as a commit status. When
+  a deployment of `main` succeeds, `live.yml` checks out that exact commit and runs the Playwright
+  suite (mobile, tablet, desktop, with and without JavaScript) and the Lighthouse budgets against the
+  public URL. Run by hand at delivery time: 112 e2e passed (17 skipped by design) and every
+  Lighthouse category ≥ 98.
+- **Self-hosting** is covered by the Docker `prod` image (standalone, non-root, with a healthcheck),
+  which CI builds and starts on every pull request.
 
 ## Key decisions
 
@@ -155,8 +197,9 @@ scores can be a few points noisier than on a local machine.
   configured, but on my machine the Docker VM ran out of disk space (`ENOSPC`) while installing
   dependencies. The scores above come from the same production build run on the host. The Docker
   **e2e** service did run successfully.
-- Mobile performance is **95**, right at the target. The remaining cost is the Next.js/React
-  runtime under simulated slow-4G throttling. Desktop scores 100.
+- On a local production build (no CDN), mobile performance is **95**, right at the target; the
+  remaining cost is the Next.js/React runtime under simulated slow-4G throttling. The live site
+  scores 98–100.
 - Placeholder `#` links and the Lorem ipsum text listed above.
 - The contact form does not deliver messages (no backend, as allowed by the brief).
 - Not tested on real Safari/iOS hardware yet. Automated runs use Chromium with mobile emulation.
@@ -203,13 +246,15 @@ src/
   app/            layout (fonts, metadata, skip link), page, Server Action, robots, sitemap, OG image
   components/
     ui/           Button, ButtonLink, Chip, Eyebrow, SectionHeading, AvatarStack, Container, icons
-    layout/       Header, MobileNav (client), Footer, Logo
+    layout/       Header, MobileNav (client), SmoothScroll (client), Footer, Logo
     contact/      ContactForm (client), ContactFormBoundary, FormField
     sections/     Hero, Categories, FeaturedCourse, HowItWorks, Testimonial, People, Contact, FinalCta
   content/        typed copy and image metadata
-  lib/            contact schema/state, fonts, site URL
+  lib/            contact schema/state, fonts, site URL (SITE_URL / Vercel / localhost)
 tests/
   unit/           Vitest
   e2e/            Playwright
-.github/workflows/ci.yml   CI pipeline
+.github/workflows/
+  ci.yml          checks on every pull request and on main
+  live.yml        e2e + Lighthouse against the deployed site
 ```
