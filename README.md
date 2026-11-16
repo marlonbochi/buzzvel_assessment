@@ -165,7 +165,7 @@ scores can be a few points noisier than on a local machine.
 
 ## Time spent
 
-Approximately **_X hours_** (to be filled in by the author).
+Approximately **4 hours**, about 3 of them pair-programming with Claude Code, spread over three days.
 
 ---
 
