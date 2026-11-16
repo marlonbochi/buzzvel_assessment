@@ -91,7 +91,7 @@ export function FinalCta() {
   return (
     <section
       aria-labelledby="final-cta-title"
-      className="relative overflow-hidden bg-background-yellow py-16 lg:py-[100px]"
+      className="relative overflow-hidden bg-background-yellow py-15 lg:py-[100px]"
     >
       <Decorations />
       <Container className="relative flex flex-col items-center text-center">
@@ -101,15 +101,10 @@ export function FinalCta() {
         </h2>
         <p className="mt-4 text-subtitle-1 text-text-secondary">{finalCta.description}</p>
         <div className="mt-10 flex w-full flex-col gap-3 md:w-auto md:flex-row">
-          <ButtonLink href={finalCta.primaryCta.href} block="mobile" className="max-md:text-base">
+          <ButtonLink href={finalCta.primaryCta.href} block="mobile">
             {finalCta.primaryCta.label}
           </ButtonLink>
-          <ButtonLink
-            href={finalCta.secondaryCta.href}
-            variant="outline"
-            block="mobile"
-            className="max-md:text-base"
-          >
+          <ButtonLink href={finalCta.secondaryCta.href} variant="outline" block="mobile">
             {finalCta.secondaryCta.label}
           </ButtonLink>
         </div>

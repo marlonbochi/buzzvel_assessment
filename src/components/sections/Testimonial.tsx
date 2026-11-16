@@ -6,8 +6,8 @@ import { stats, testimonial } from "@/content";
 /** Testimonial + stats (Figma 2:305 desktop, 2:4471 mobile). */
 export function Testimonial() {
   return (
-    <section aria-label="What learners say" className="bg-background-white py-16 lg:py-[100px]">
-      <Container className="flex flex-col gap-12 lg:flex-row lg:items-center lg:justify-between lg:gap-10">
+    <section aria-label="What learners say" className="bg-background-white py-15 lg:py-[100px]">
+      <Container className="flex flex-col gap-14 lg:flex-row lg:items-center lg:justify-between lg:gap-10">
         <figure className="flex max-w-[600px] flex-col lg:flex-1">
           <QuoteIcon className="h-[22px] w-6 text-primary-blue" />
           <blockquote className="pt-4 text-quote text-text-primary">
@@ -38,7 +38,7 @@ export function Testimonial() {
           {stats.map((stat) => (
             <li key={stat.label} className="flex flex-col">
               <span className="text-h1 text-primary-blue">{stat.value}</span>
-              <span className="pt-1 text-sm leading-6 text-text-tertiary max-lg:text-base">
+              <span className="pt-1 text-sm leading-6 text-text-tertiary lg:h-[25px]">
                 {stat.label}
               </span>
             </li>

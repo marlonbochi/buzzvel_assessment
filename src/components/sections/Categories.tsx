@@ -9,7 +9,7 @@ export function Categories() {
     <section
       id="courses"
       aria-labelledby="courses-title"
-      className="bg-background-white py-16 lg:py-[100px]"
+      className="bg-background-white py-15 lg:py-[100px]"
     >
       <Container>
         <SectionHeading

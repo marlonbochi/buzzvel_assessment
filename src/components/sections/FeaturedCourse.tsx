@@ -8,8 +8,8 @@ import { featuredCourse } from "@/content";
 /** Featured course on blue (Figma 2:193 desktop, 2:4361 mobile). */
 export function FeaturedCourse() {
   return (
-    <section aria-labelledby="featured-title" className="bg-primary-blue py-16 lg:py-[100px]">
-      <Container className="flex flex-col gap-12 lg:flex-row lg:items-center lg:gap-15">
+    <section aria-labelledby="featured-title" className="bg-primary-blue py-15 lg:py-[100px]">
+      <Container className="flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-15">
         <div className="relative lg:min-w-0 lg:flex-1">
           <div className="relative aspect-[362/280] overflow-hidden rounded-2xl bg-primary-blue-light md:aspect-[16/10] lg:aspect-auto lg:h-[408px]">
             <Image
@@ -33,10 +33,10 @@ export function FeaturedCourse() {
             eyebrow={featuredCourse.eyebrow}
             title={featuredCourse.title}
           />
-          <p className="mt-5 text-subtitle-2 text-text-white-primary max-md:text-base max-md:leading-6">
+          <p className="mt-5 text-subtitle-2 text-text-white-primary">
             {featuredCourse.description}
           </p>
-          <p className="mt-6 text-subtitle-2 text-text-white-primary max-md:text-base">
+          <p className="mt-6 text-subtitle-2 text-text-white-primary">
             {featuredCourse.instructor}
           </p>
 
@@ -49,19 +49,14 @@ export function FeaturedCourse() {
           </ul>
 
           <div className="mt-8 flex flex-col items-center gap-3 md:flex-row">
-            <ButtonLink
-              href={featuredCourse.primaryCta.href}
-              variant="yellow"
-              block="mobile"
-              className="max-md:text-base"
-            >
+            <ButtonLink href={featuredCourse.primaryCta.href} variant="yellow" block="mobile">
               {featuredCourse.primaryCta.label}
             </ButtonLink>
             <ButtonLink
               href={featuredCourse.secondaryCta.href}
               variant="text"
               withArrow
-              className="px-4 py-3.5 text-text-white-primary max-md:text-base"
+              className="px-4 py-3.5 text-text-white-primary"
             >
               {featuredCourse.secondaryCta.label}
             </ButtonLink>

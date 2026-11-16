@@ -17,7 +17,7 @@ export function Hero() {
       aria-labelledby="hero-title"
       className="overflow-x-clip bg-background-light-yellow pt-15 pb-16 lg:py-[100px]"
     >
-      <Container className="flex flex-col gap-12 lg:flex-row lg:items-start lg:gap-15">
+      <Container className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-15">
         <div className="flex flex-col lg:min-w-0 lg:flex-1">
           <SectionHeading
             id="hero-title"
@@ -31,22 +31,17 @@ export function Hero() {
           </p>
 
           <div className="mt-8 flex flex-col gap-3 md:flex-row">
-            <ButtonLink href={hero.primaryCta.href} block="mobile" className="max-md:text-base">
+            <ButtonLink href={hero.primaryCta.href} block="mobile">
               {hero.primaryCta.label}
             </ButtonLink>
-            <ButtonLink
-              href={hero.secondaryCta.href}
-              variant="outline"
-              block="mobile"
-              className="max-md:text-base"
-            >
+            <ButtonLink href={hero.secondaryCta.href} variant="outline" block="mobile">
               {hero.secondaryCta.label}
             </ButtonLink>
           </div>
 
-          <div className="mt-16 flex items-center justify-center gap-3 md:mt-8 md:justify-start">
+          <div className="mt-8 flex items-center justify-center gap-3 md:justify-start">
             <AvatarStack avatars={hero.avatars} />
-            <p className="text-sm leading-6 text-text-secondary max-md:text-base">
+            <p className="text-sm leading-6 text-text-secondary">
               <strong className="font-bold text-text-primary">{hero.trust.strong}</strong>{" "}
               {hero.trust.rest}
             </p>

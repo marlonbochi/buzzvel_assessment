@@ -165,29 +165,32 @@ export function ContactForm({
         ))}
       </div>
 
-      <Button
-        ref={submitRef}
-        type="submit"
-        block="always"
-        pending={isPending}
-        pendingLabel={contactForm.pending}
-      >
-        {contactForm.submit}
-      </Button>
+      {/* Button and live region share a wrapper so the (usually empty) status adds no gap. */}
+      <div>
+        <Button
+          ref={submitRef}
+          type="submit"
+          block="always"
+          pending={isPending}
+          pendingLabel={contactForm.pending}
+        >
+          {contactForm.submit}
+        </Button>
 
-      <p
-        role="status"
-        className={cx(
-          "text-sm leading-6 font-semibold",
-          showFailure ? "text-error" : "text-[#1d7a46]",
-        )}
-      >
-        {showFailure
-          ? CONTACT_MESSAGES.sendFailed
-          : state.status === "success" && !isPending
-            ? CONTACT_MESSAGES.success
-            : ""}
-      </p>
+        <p
+          role="status"
+          className={cx(
+            "mt-3 text-sm leading-6 font-semibold empty:mt-0",
+            showFailure ? "text-error" : "text-[#1d7a46]",
+          )}
+        >
+          {showFailure
+            ? CONTACT_MESSAGES.sendFailed
+            : state.status === "success" && !isPending
+              ? CONTACT_MESSAGES.success
+              : ""}
+        </p>
+      </div>
     </form>
   );
 }
