@@ -46,7 +46,7 @@ export function SectionHeading({
       {description && (
         <p
           className={cx(
-            "mt-4 text-subtitle-1 lg:mt-6",
+            "mt-4 text-subtitle-1",
             light ? "text-text-white-secondary" : "text-text-secondary",
           )}
         >

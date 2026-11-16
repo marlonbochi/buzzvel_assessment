@@ -102,9 +102,9 @@ export function People() {
     <section
       id="people"
       aria-labelledby="people-title"
-      className="bg-background-light-yellow py-16 lg:py-[100px]"
+      className="bg-background-light-yellow py-15 lg:py-[100px]"
     >
-      <Container className="flex flex-col gap-12 lg:flex-row lg:items-center lg:gap-15">
+      <Container className="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-15">
         <div className="flex flex-col items-start lg:w-[530px] lg:shrink-0">
           <SectionHeading
             id="people-title"

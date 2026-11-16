@@ -47,13 +47,17 @@ export function FormField({
         {label}
       </label>
       {multiline ? (
-        <textarea {...shared} rows={4} className={cx(shared.className, "h-30 resize-y py-3.5")} />
+        <textarea
+          {...shared}
+          rows={4}
+          className={cx(shared.className, "h-25 resize-y py-3.5 lg:h-30")}
+        />
       ) : (
         <input
           {...shared}
           type={type}
           autoComplete={autoComplete}
-          className={cx(shared.className, "py-3")}
+          className={cx(shared.className, "h-12 py-3")}
         />
       )}
       {error && (

@@ -21,9 +21,10 @@ const variants: Record<ButtonVariant, string> = {
 };
 
 const sizes: Record<ButtonSize, string> = {
-  sm: "px-5 py-2.5 text-sm leading-6",
-  md: "px-7 py-3.5 text-sm leading-6",
-  lg: "px-7 py-3.5 text-base leading-6",
+  // Fixed heights: borders count inside the box, as Figma's inside strokes do (outline = 52px too).
+  sm: "h-11 px-5 py-2.5 text-sm leading-6",
+  md: "h-13 px-7 py-3.5 text-sm leading-6",
+  lg: "h-13 px-7 py-3.5 text-base leading-6",
 };
 
 const blocks: Record<ButtonBlock, string> = {
@@ -47,7 +48,9 @@ export function buttonClasses({
     base,
     variants[variant],
     // The text variant has no box: padding would misalign it with surrounding text.
-    variant === "text" ? sizes[size].replace(/p[xy]-[\d.]+ /g, "") : sizes[size],
+    variant === "text"
+      ? sizes[size].replace(/(?:^|\s)(?:h|p[xy])-[\d.]+(?=\s)/g, "").trim()
+      : sizes[size],
     blocks[block],
     className,
   );

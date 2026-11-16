@@ -12,7 +12,7 @@ export function HowItWorks() {
     <section
       id="how-it-works"
       aria-labelledby="how-it-works-title"
-      className="bg-background-light-yellow py-16 lg:py-[100px]"
+      className="bg-background-light-yellow py-15 lg:py-[100px]"
     >
       <Container>
         <SectionHeading
@@ -23,7 +23,7 @@ export function HowItWorks() {
           title={howItWorksSection.title}
         />
 
-        <div className="relative mt-12 md:mt-20 md:py-7">
+        <div className="relative mt-10 md:mt-20 md:py-7">
           {/* Spans icon 1 centre → icon 3 centre: 28px + 2 columns + 2 gaps. */}
           <div
             aria-hidden="true"
