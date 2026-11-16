@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { SmoothScroll } from "@/components/layout/SmoothScroll";
 import { inter, jakarta } from "@/lib/fonts";
 import { siteUrl } from "@/lib/site";
 import "./globals.css";
@@ -39,6 +40,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         {children}
+        <SmoothScroll />
       </body>
     </html>
   );

@@ -68,7 +68,7 @@ pnpm build && pnpm start   # production server (standalone output)
 | ----------- | ---------------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Unit        | Vitest + Testing Library                 | 73                         | Content rules, primitives, mobile menu (Esc, focus trap, scroll lock), form validation and states, failed-request recovery, schema edge cases, Server Action                                                     |
 | Components  | Storybook 10 + addon-vitest + addon-a11y | 51 stories                 | Every component and section renders at mobile/tablet/desktop with **zero axe violations**. Play functions cover the menu and form                                                                                |
-| End-to-end  | Playwright + @axe-core/playwright        | 103 (17 skipped by design) | Every anchor click, mobile menu by touch and keyboard, form with and without JavaScript, hover/focus, reduced motion, no horizontal scroll at 320–1440px (incl. 1024–1200), no console errors or failed requests |
+| End-to-end  | Playwright + @axe-core/playwright        | 112 (17 skipped by design) | Every anchor click, mobile menu by touch and keyboard, form with and without JavaScript, hover/focus, reduced motion, no horizontal scroll at 320–1440px (incl. 1024–1200), no console errors or failed requests |
 | Performance | Lighthouse CI                            | 6 runs                     | Every category ≥ 95 on mobile and desktop, CLS ≤ 0.1                                                                                                                                                             |
 
 The 17 skips are intentional: the hamburger-menu specs don't run on desktop, and the hover-only
@@ -120,7 +120,8 @@ scores can be a few points noisier than on a local machine.
 
 ### Architecture
 
-- **Server Components by default.** Only `MobileNav` and `ContactForm` ship JavaScript.
+- **Server Components by default.** Only `MobileNav`, `ContactForm` and a tiny `SmoothScroll` effect
+  ship JavaScript.
 - **Typed content** lives in `src/content/*`, so components stay presentational and the copy is unit-tested
   (for example, a test fails if any Portuguese text leaks in).
 - **Contact form**: a `useActionState` + Server Action, with a **shared zod schema** (`zod/mini`, to keep the
@@ -134,8 +135,10 @@ scores can be a few points noisier than on a local machine.
   AVIF/WebP. Only the hero image (the LCP element) loads eagerly with high priority.
   The "people" collage uses container-query units so it scales proportionally down to 320px.
 - **Fonts**: Plus Jakarta Sans and Inter through `next/font` (self-hosted, variable, `swap`).
-- **Motion**: CSS transitions only. `prefers-reduced-motion` disables smooth scroll, transitions and
-  animations globally (covered by e2e).
+- **Motion**: CSS transitions only. Smooth scrolling is switched on after the page loads, so opening
+  or reloading a deep link such as `/#people` jumps straight to the section instead of animating
+  through the page. `prefers-reduced-motion` disables smooth scroll, transitions and animations
+  globally (both covered by e2e).
 - **Storybook** is a dev-only dependency. The production image was checked and contains no Storybook files.
 
 ### Performance notes
@@ -151,17 +154,16 @@ scores can be a few points noisier than on a local machine.
 - **Lighthouse inside Docker was not run to completion.** The `lighthouse` compose service is
   configured, but on my machine the Docker VM ran out of disk space (`ENOSPC`) while installing
   dependencies. The scores above come from the same production build run on the host. The Docker
-  **e2e** service did run successfully (103 passed).
+  **e2e** service did run successfully.
 - Mobile performance is **95**, right at the target. The remaining cost is the Next.js/React
   runtime under simulated slow-4G throttling. Desktop scores 100.
 - Placeholder `#` links and the Lorem ipsum text listed above.
 - The contact form does not deliver messages (no backend, as allowed by the brief).
 - Not tested on real Safari/iOS hardware yet. Automated runs use Chromium with mobile emulation.
 - Small things noted in review and left for later: a field shows its error when you tab past it
-  empty; the success message stays until the next submit; opening `/#contact` animates the smooth
-  scroll on load; while the mobile menu is open the page behind it is not `inert` (Tab is trapped,
-  but a screen reader's virtual cursor can leave the menu); without JavaScript the hamburger does
-  nothing (the footer links still work).
+  empty; the success message stays until the next submit; while the mobile menu is open the page
+  behind it is not `inert` (Tab is trapped, but a screen reader's virtual cursor can leave the
+  menu); without JavaScript the hamburger does nothing (the footer links still work).
 
 ## Time spent
 

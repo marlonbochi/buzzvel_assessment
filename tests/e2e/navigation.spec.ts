@@ -146,3 +146,31 @@ test("Review Focus 3: deep link /#contact lands below the sticky header", async 
     .poll(async () => (await heading.boundingBox())!.y, { timeout: 5000 })
     .toBeGreaterThanOrEqual(HEADER_HEIGHT);
 });
+
+test("loading or reloading a deep link jumps straight to the section, without animating", async ({
+  page,
+}) => {
+  const heading = page.getByRole("heading", {
+    name: "Meet international students & teachers",
+    exact: true,
+  });
+  const y = async () => (await heading.boundingBox())!.y;
+
+  for (const load of [() => page.goto("/#people"), () => page.reload()]) {
+    await load();
+    const atLoad = await y();
+    await page.waitForTimeout(400);
+    expect(await y(), "the page must not still be scrolling after load").toBe(atLoad);
+    expect(atLoad).toBeGreaterThanOrEqual(HEADER_HEIGHT);
+    await expect(heading).toBeInViewport();
+  }
+});
+
+test("smooth scrolling is enabled for in-page clicks once the page has loaded", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect
+    .poll(() => page.evaluate(() => getComputedStyle(document.documentElement).scrollBehavior))
+    .toBe("smooth");
+});

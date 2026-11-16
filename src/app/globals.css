@@ -155,8 +155,9 @@
   }
 }
 
+/* Set by <SmoothScroll /> after load, so deep links (/#people) jump instead of animating. */
 @media (prefers-reduced-motion: no-preference) {
-  html {
+  html[data-smooth-scroll] {
     scroll-behavior: smooth;
   }
 }
